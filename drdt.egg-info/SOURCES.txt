@@ -4,6 +4,10 @@ DrDT.egg-info/PKG-INFO
 DrDT.egg-info/SOURCES.txt
 DrDT.egg-info/dependency_links.txt
 DrDT.egg-info/top_level.txt
+DrDt.egg-info/PKG-INFO
+DrDt.egg-info/SOURCES.txt
+DrDt.egg-info/dependency_links.txt
+DrDt.egg-info/top_level.txt
 datasets/__init__.py
 datasets/DecisionRuleSystems/__init__.py
 datasets/UCIMLDatasets/__init__.py
