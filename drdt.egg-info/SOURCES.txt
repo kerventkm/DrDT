@@ -1,5 +1,8 @@
 README.md
 setup.py
+datasets/__init__.py
+datasets/DecisionRuleSystems/__init__.py
+datasets/UCIMLDatasets/__init__.py
 drdt/__init__.py
 drdt/algorithms.py
 drdt/helper_functions.py
