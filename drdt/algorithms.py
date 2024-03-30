@@ -22,6 +22,8 @@ class A_C_N:
         """
         self.C = C
         self.N = N
+        self.depth = 0
+        self.rules = None
         
     def solve(self, S, delta):
         """
@@ -38,16 +40,18 @@ class A_C_N:
                     if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
                         if Q.empty:
 #                             print("There is no such rule")
-                            return
+                            return self.depth, self.rules
                         else:
                             row_indecies = Q.index.tolist()
-                            return S.loc[row_indecies]
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
                        
                     # Step 2
                     else:
                         Q_plus = SPlus(Q)
                         B = NCover(Q_plus)
                         for attr in B:
+                            self.depth += 1
                             alpha = (attr, delta[attr])
                             Q = SAlphaStep(Q, alpha)
                             
@@ -58,15 +62,17 @@ class A_C_N:
                     if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
                         if Q.empty:
 #                             print("There is no such rule")
-                            return
+                            return self.depth, self.rules
                         else:
                             row_indecies = Q.index.tolist()
-                            return S.loc[row_indecies]
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
                     # Step 2
                     else:
                         Q_plus = SPlus(Q)
                         B = NGreedy(Q_plus)
                         for attr in B:
+                            self.depth += 1
                             alpha = (attr, delta[attr])
                             Q = SAlphaStep(Q, alpha)
             
@@ -80,20 +86,22 @@ class A_C_N:
                 Q = S.copy()
                 while True:
                     # Step 1
-                    if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
-                        if Q.empty:
+                    P = R_SR(Q)
+                    if (P.empty or P.iloc[:, :-1].isna().all().all()):
+                        if P.empty:
 #                             print("There is no such rule")
-                            return
+                            return self.depth, self.rules
                         else:
-                            row_indecies = Q.index.tolist()
-                            return S.loc[row_indecies]
+                            row_indecies = P.index.tolist()
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
                        
                     # Step 2
                     else:
-                        P = R_SR(Q)
                         P_plus = SPlus(P)
                         B = NCover(P_plus)
                         for attr in B:
+                            self.depth += 1
                             alpha = (attr, delta[attr])
                             P = SAlphaStep(P, alpha)
                         Q = P
@@ -105,10 +113,11 @@ class A_C_N:
                     if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
                         if Q.empty:
 #                             print("There is no such rule")
-                            return
+                            return self.depth, self.rules
                         else:
                             row_indecies = Q.index.tolist()
-                            return S.loc[row_indecies]
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
                        
                     # Step 2
                     else:
@@ -116,6 +125,7 @@ class A_C_N:
                         P_plus = SPlus(P)
                         B = NGreedy(P_plus)
                         for attr in B:
+                            self.depth += 1
                             alpha = (attr, delta[attr])
                             P = SAlphaStep(P, alpha)
                         Q = P
@@ -132,10 +142,11 @@ class A_C_N:
                     if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
                         if Q.empty:
 #                             print("There is no such rule")
-                            return
+                            return self.depth, self.rules
                         else:
                             row_indecies = Q.index.tolist()
-                            return S.loc[row_indecies]
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
                        
                     # Step 2
                     else:
@@ -143,6 +154,7 @@ class A_C_N:
                         P_plus = SPlus(P)
                         B = NCover(P_plus)
                         for attr in B:
+                            self.depth += 1
                             alpha = (attr, delta[attr])
                             P = SAlphaStep(P, alpha)
                         Q = P
@@ -154,10 +166,11 @@ class A_C_N:
                     if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
                         if Q.empty:
 #                             print("There is no such rule")
-                            return
+                            return self.depth, self.rules
                         else:
                             row_indecies = Q.index.tolist()
-                            return S.loc[row_indecies]
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
                        
                     # Step 2
                     else:
@@ -165,6 +178,7 @@ class A_C_N:
                         P_plus = SPlus(P)
                         B = NGreedy(P_plus)
                         for attr in B:
+                            self.depth += 1
                             alpha = (attr, delta[attr])
                             P = SAlphaStep(P, alpha)
                         Q = P
