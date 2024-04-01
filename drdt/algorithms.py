@@ -24,12 +24,14 @@ class A_C_N:
         self.N = N
         self.depth = 0
         self.rules = None
+        self.R_C = Reduction(C)
         
     def solve(self, S, delta):
         """
         S - System of Decision Rules (pandas DataFrame)
         delta - tuple of attribute values from the set V_C (a row of a pandas df, without any NaN values)
         """
+        num_of_features = len(S.columns)-1
         
         # AR - All Rules problem, EAR - Extended All Rules problem
         if self.C in ["AR", "EAR"]:
@@ -37,56 +39,7 @@ class A_C_N:
                 Q = S.copy()
                 while True:
                     # Step 1
-                    if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
-                        if Q.empty:
-#                             print("There is no such rule")
-                            return self.depth, self.rules
-                        else:
-                            row_indecies = Q.index.tolist()
-                            self.rules = S.loc[row_indecies]
-                            return self.depth, self.rules
-                       
-                    # Step 2
-                    else:
-                        Q_plus = SPlus(Q)
-                        B = NCover(Q_plus)
-                        for attr in B:
-                            self.depth += 1
-                            alpha = (attr, delta[attr])
-                            Q = SAlphaStep(Q, alpha)
-                            
-            elif self.N == "greedy": # with "cover" NodeCover method
-                Q = S.copy()
-                while True:
-                    # Step 1
-                    if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
-                        if Q.empty:
-#                             print("There is no such rule")
-                            return self.depth, self.rules
-                        else:
-                            row_indecies = Q.index.tolist()
-                            self.rules = S.loc[row_indecies]
-                            return self.depth, self.rules
-                    # Step 2
-                    else:
-                        Q_plus = SPlus(Q)
-                        B = NGreedy(Q_plus)
-                        for attr in B:
-                            self.depth += 1
-                            alpha = (attr, delta[attr])
-                            Q = SAlphaStep(Q, alpha)
-            
-            else:
-                raise ValueError("N must be 'cover' or 'greedy'.")
-            
-                
-        # SR - Some Rules problem, ESR - Extended Some Rules problem
-        elif self.C in ["SR", "ESR"]:
-            if self.N == "cover": # with "cover" NodeCover method
-                Q = S.copy()
-                while True:
-                    # Step 1
-                    P = R_SR(Q)
+                    P = self.R_C(Q)
                     if (P.empty or P.iloc[:, :-1].isna().all().all()):
                         if P.empty:
 #                             print("There is no such rule")
@@ -100,6 +53,10 @@ class A_C_N:
                     else:
                         P_plus = SPlus(P)
                         B = NCover(P_plus)
+                        
+                        if len(B) == num_of_features:    # Checking, if they are same no need to run further
+                            return num_of_features, "when we focus just depth"
+                        
                         for attr in B:
                             self.depth += 1
                             alpha = (attr, delta[attr])
@@ -110,20 +67,85 @@ class A_C_N:
                 Q = S.copy()
                 while True:
                     # Step 1
-                    if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
-                        if Q.empty:
+                    P = self.R_C(Q)
+                    if (P.empty or P.iloc[:, :-1].isna().all().all()):
+                        if P.empty:
 #                             print("There is no such rule")
                             return self.depth, self.rules
                         else:
-                            row_indecies = Q.index.tolist()
+                            row_indecies = P.index.tolist()
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
+                    # Step 2
+                    else:
+                        P_plus = SPlus(P)
+                        B = NGreedy(P_plus)
+                        
+                        if len(B) == num_of_features:    # Checking, if they are same no need to run further
+                            return num_of_features, "when we focus just depth"
+                        
+                        for attr in B:
+                            self.depth += 1
+                            alpha = (attr, delta[attr])
+                            P = SAlphaStep(P, alpha)
+                        Q = P
+            
+            else:
+                raise ValueError("N must be 'cover' or 'greedy'.")
+            
+                
+        # SR - Some Rules problem, ESR - Extended Some Rules problem
+        elif self.C in ["SR", "ESR"]:
+            if self.N == "cover": # with "cover" NodeCover method
+                Q = S.copy()
+                while True:
+                    # Step 1
+                    P = self.R_C(Q)
+                    if (P.empty or P.iloc[:, :-1].isna().all().all()):
+                        if P.empty:
+#                             print("There is no such rule")
+                            return self.depth, self.rules
+                        else:
+                            row_indecies = P.index.tolist()
                             self.rules = S.loc[row_indecies]
                             return self.depth, self.rules
                        
                     # Step 2
                     else:
-                        P = R_SR(Q)
+                        P_plus = SPlus(P)
+                        B = NCover(P_plus)
+                        
+                        if len(B) == num_of_features:    # Checking, if they are same no need to run further
+                            return num_of_features, "when we focus just depth"
+                        
+                        for attr in B:
+                            self.depth += 1
+                            alpha = (attr, delta[attr])
+                            P = SAlphaStep(P, alpha)
+                        Q = P
+                            
+            elif self.N == "greedy": # with "cover" NodeCover method
+                Q = S.copy()
+                while True:
+                    # Step 1
+                    P = self.R_C(Q)
+                    if (P.empty or P.iloc[:, :-1].isna().all().all()):
+                        if P.empty:
+#                             print("There is no such rule")
+                            return self.depth, self.rules
+                        else:
+                            row_indecies = P.index.tolist()
+                            self.rules = S.loc[row_indecies]
+                            return self.depth, self.rules
+                       
+                    # Step 2
+                    else:
                         P_plus = SPlus(P)
                         B = NGreedy(P_plus)
+                        
+                        if len(B) == num_of_features:    # Checking, if they are same no need to run further
+                            return num_of_features, "when we focus just depth"
+                        
                         for attr in B:
                             self.depth += 1
                             alpha = (attr, delta[attr])
@@ -139,20 +161,24 @@ class A_C_N:
                 Q = S.copy()
                 while True:
                     # Step 1
-                    if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
-                        if Q.empty:
+                    P = self.R_C(Q)
+                    if (P.empty or P.iloc[:, :-1].isna().all().all()):
+                        if P.empty:
 #                             print("There is no such rule")
                             return self.depth, self.rules
                         else:
-                            row_indecies = Q.index.tolist()
+                            row_indecies = P.index.tolist()
                             self.rules = S.loc[row_indecies]
                             return self.depth, self.rules
                        
                     # Step 2
                     else:
-                        P = R_AD(Q)
                         P_plus = SPlus(P)
                         B = NCover(P_plus)
+                        
+                        if len(B) == num_of_features:    # Checking, if they are same no need to run further
+                            return num_of_features, "when we focus just depth"
+                        
                         for attr in B:
                             self.depth += 1
                             alpha = (attr, delta[attr])
@@ -163,20 +189,24 @@ class A_C_N:
                 Q = S.copy()
                 while True:
                     # Step 1
-                    if (Q.empty or Q.iloc[:, :-1].isna().all().all()):
-                        if Q.empty:
+                    P = self.R_C(Q)
+                    if (P.empty or P.iloc[:, :-1].isna().all().all()):
+                        if P.empty:
 #                             print("There is no such rule")
                             return self.depth, self.rules
                         else:
-                            row_indecies = Q.index.tolist()
+                            row_indecies = P.index.tolist()
                             self.rules = S.loc[row_indecies]
                             return self.depth, self.rules
                        
                     # Step 2
                     else:
-                        P = R_AD(Q)
                         P_plus = SPlus(P)
                         B = NGreedy(P_plus)
+                        
+                        if len(B) == num_of_features:    # Checking, if they are same no need to run further
+                            return num_of_features, "when we focus just depth"
+                        
                         for attr in B:
                             self.depth += 1
                             alpha = (attr, delta[attr])
@@ -208,6 +238,9 @@ class A_C_G:
             "EAD" - Extended All Decisions
         """
         self.C = C
+        self.depth = 0
+        self.rules = None
+        self.R_C = Reduction(C)
         
     def solve(self, S, delta):
         """
@@ -220,21 +253,24 @@ class A_C_G:
             Q = S.copy()
             while True:
                 # Step 1
-                P = Q
+                P = self.R_C(Q)
                 if (P.empty or P.iloc[:, :-1].isna().all().all()):
                     if P.empty:
 #                             print("There is no such rule")
-                        return
+                        return self.depth, self.rules
                     else:
                         row_indecies = P.index.tolist()
-                        return S.loc[row_indecies]
+                        self.rules = S.loc[row_indecies]
+                        return self.depth, self.rules
 
                 # Step 2
                 else:
-                    for column in P.columns:       # We choose an attribute ai ∈ A(P) with the minimum index i
-                        if P[column].notna().any():
-                            attr = column
-                            break
+#                     for column in P.columns:       # We choose an attribute ai ∈ A(P) with the minimum index i
+#                         if P[column].notna().any():
+#                             attr = column
+#                             break
+                    self.depth += 1
+                    attr = P.iloc[:, :-1].count().idxmax() # Find the column name with the maximum number of non-NaN values
                     alpha = (attr, delta[attr])
                     Q = SAlphaStep(P, alpha)
             
@@ -243,21 +279,24 @@ class A_C_G:
             Q = S.copy()
             while True:
                 # Step 1
-                P = R_SR(Q)
+                P = self.R_C(Q)
                 if (P.empty or P.iloc[:, :-1].isna().all().all()):
                     if P.empty:
 #                             print("There is no such rule")
-                        return
+                        return self.depth, self.rules
                     else:
                         row_indecies = P.index.tolist()
-                        return S.loc[row_indecies]
+                        self.rules = S.loc[row_indecies]
+                        return self.depth, self.rules
 
                 # Step 2
                 else:
-                    for column in P.columns:       # We choose an attribute ai ∈ A(P) with the minimum index i
-                        if P[column].notna().any():
-                            attr = column
-                            break
+#                     for column in P.columns:       # We choose an attribute ai ∈ A(P) with the minimum index i
+#                         if P[column].notna().any():
+#                             attr = column
+#                             break
+                    self.depth += 1
+                    attr = P.iloc[:, :-1].count().idxmax() # Find the column name with the maximum number of non-NaN values
                     alpha = (attr, delta[attr])
                     Q = SAlphaStep(P, alpha)
                 
@@ -266,21 +305,24 @@ class A_C_G:
             Q = S.copy()
             while True:
                 # Step 1
-                P = R_AD(Q)
+                P = self.R_C(Q)
                 if (P.empty or P.iloc[:, :-1].isna().all().all()):
                     if P.empty:
 #                             print("There is no such rule")
-                        return
+                        return self.depth, self.rules
                     else:
                         row_indecies = P.index.tolist()
-                        return S.loc[row_indecies]
+                        self.rules = S.loc[row_indecies]
+                        return self.depth, self.rules
 
                 # Step 2
                 else:
-                    for column in P.columns:       # We choose an attribute ai ∈ A(P) with the minimum index i
-                        if P[column].notna().any():
-                            attr = column
-                            break
+#                     for column in P.columns:       # We choose an attribute ai ∈ A(P) with the minimum index i
+#                         if P[column].notna().any():
+#                             attr = column
+#                             break
+                    self.depth += 1
+                    attr = P.iloc[:, :-1].count().idxmax() # Find the column name with the maximum number of non-NaN values
                     alpha = (attr, delta[attr])
                     Q = SAlphaStep(P, alpha)
                 

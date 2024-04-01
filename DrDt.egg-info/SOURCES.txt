@@ -1,5 +1,9 @@
 README.md
 setup.py
+DrDT.egg-info/PKG-INFO
+DrDT.egg-info/SOURCES.txt
+DrDT.egg-info/dependency_links.txt
+DrDT.egg-info/top_level.txt
 DrDt.egg-info/PKG-INFO
 DrDt.egg-info/SOURCES.txt
 DrDt.egg-info/dependency_links.txt
@@ -7,7 +11,13 @@ DrDt.egg-info/top_level.txt
 datasets/__init__.py
 datasets/DecisionRuleSystems/__init__.py
 datasets/UCIMLDatasets/__init__.py
+datasets/UCIMLDatasets/car_evaluation.csv
+datasets/UCIMLDatasets/tic-tac-toe.csv
 drdt/__init__.py
 drdt/algorithms.py
 drdt/helper_functions.py
+drdt.egg-info/PKG-INFO
+drdt.egg-info/SOURCES.txt
+drdt.egg-info/dependency_links.txt
+drdt.egg-info/top_level.txt
 drdt/experiments/__init__.py
