@@ -401,10 +401,10 @@ class DynamicProgrammingAlgorithms:
 
             for a in Q.columns[Q.notna().any()].tolist()[:-1]: # Finding columns with at least one non-NaN value
                 for delta in np.append(S[a].dropna().unique(), "*"):  # Find unique non-NaN values in column a
-                    try:
-                        delta = float(delta)
-                    except ValueError:
-                        pass 
+                    # try:
+                    #     delta = float(delta)
+                    # except ValueError:
+                    #     pass 
                     new_node_data = SAlphaStep(Q, (a, delta))# if type(delta) in [str, np.str_] else int(delta)))
                     not_equal = True
                     for node in DAG.nodes:
